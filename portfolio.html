@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lynet Yutian Zhang — Design Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0f0f0d;
+    --ink-mid: #3a3a36;
+    --ink-muted: #8a8a82;
+    --paper: #f7f5f0;
+    --paper-warm: #eeece6;
+    --accent: #b8a882;
+    --line: rgba(15,15,13,0.12);
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans: 'Outfit', system-ui, sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-weight: 300;
+    line-height: 1.6;
+    cursor: none;
+    overflow-x: hidden;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 8px; height: 8px;
+    background: var(--ink);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: width 0.25s, height 0.25s, background 0.25s;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 32px; height: 32px;
+    border: 1px solid var(--ink);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s linear, width 0.3s, height 0.3s, opacity 0.3s;
+    opacity: 0.5;
+  }
+  body:has(a:hover) .cursor, body:has(.project-card:hover) .cursor { width: 12px; height: 12px; background: var(--accent); }
+  body:has(a:hover) .cursor-ring, body:has(.project-card:hover) .cursor-ring { width: 48px; height: 48px; opacity: 0.3; }
+
+  /* Nav */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 28px 56px;
+    mix-blend-mode: multiply;
+  }
+  .nav-logo {
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 40px; }
+  .nav-links a {
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-mid);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--ink); }
+
+  /* Hero */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 120px 56px 80px;
+    position: relative;
+    z-index: 2;
+  }
+  .hero-eyebrow {
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 32px;
+  }
+  .hero-name {
+    font-family: var(--serif);
+    font-size: clamp(52px, 6vw, 88px);
+    font-weight: 300;
+    line-height: 1.0;
+    letter-spacing: -0.01em;
+    margin-bottom: 40px;
+  }
+  .hero-name em { font-style: italic; color: var(--ink-mid); }
+  .hero-desc {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--ink-mid);
+    line-height: 1.9;
+    max-width: 360px;
+    margin-bottom: 56px;
+  }
+  .hero-stats {
+    display: flex; gap: 40px;
+  }
+  .hero-stat-num {
+    font-family: var(--serif);
+    font-size: 36px;
+    font-weight: 300;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .hero-stat-label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+  .hero-right {
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-right img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: grayscale(20%);
+    transform: scale(1.04);
+    transition: transform 8s ease;
+  }
+  .hero-right:hover img { transform: scale(1.0); }
+  .hero-right::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(to right, var(--paper) 0%, transparent 30%);
+  }
+  .hero-line {
+    position: absolute;
+    bottom: 80px; left: 56px;
+    width: 48px; height: 1px;
+    background: var(--accent);
+  }
+
+  /* Section */
+  section { padding: 120px 56px; }
+  .section-label {
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 64px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .section-label::before {
+    content: '';
+    width: 32px; height: 1px;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* About */
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+  .about-headline {
+    font-family: var(--serif);
+    font-size: clamp(32px, 3.5vw, 52px);
+    font-weight: 300;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .about-headline em { font-style: italic; color: var(--ink-muted); }
+  .about-body { font-size: 14px; line-height: 2.0; color: var(--ink-mid); }
+  .about-body p + p { margin-top: 20px; }
+  .about-caps {
+    margin-top: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .cap-tag {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border: 1px solid var(--line);
+    color: var(--ink-mid);
+  }
+
+  /* Projects */
+  #work { padding-top: 0; }
+  .projects-header {
+    padding: 0 56px 64px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+  .projects-headline {
+    font-family: var(--serif);
+    font-size: clamp(36px, 4vw, 60px);
+    font-weight: 300;
+    line-height: 1.1;
+  }
+  .projects-count {
+    font-family: var(--serif);
+    font-size: 72px;
+    font-weight: 300;
+    color: var(--paper-warm);
+    line-height: 1;
+    -webkit-text-stroke: 1px var(--line);
+  }
+
+  /* Project cards */
+  .project-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 560px;
+    border-top: 1px solid var(--line);
+    cursor: none;
+    overflow: hidden;
+  }
+  .project-card:last-child { border-bottom: 1px solid var(--line); }
+  .project-card.reverse { direction: rtl; }
+  .project-card.reverse > * { direction: ltr; }
+
+  .project-image {
+    position: relative;
+    overflow: hidden;
+    background: var(--paper-warm);
+  }
+  .project-image img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: grayscale(15%);
+    transform: scale(1.06);
+    transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.6s;
+  }
+  .project-card:hover .project-image img {
+    transform: scale(1.0);
+    filter: grayscale(0%);
+  }
+  .project-image-overlay {
+    position: absolute; inset: 0;
+    background: rgba(15,15,13,0);
+    transition: background 0.5s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .project-card:hover .project-image-overlay { background: rgba(15,15,13,0.08); }
+
+  .project-info {
+    padding: 64px 64px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: var(--paper);
+  }
+  .project-num {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--ink-muted);
+    margin-bottom: 24px;
+  }
+  .project-title {
+    font-family: var(--serif);
+    font-size: clamp(28px, 3vw, 44px);
+    font-weight: 300;
+    line-height: 1.15;
+    margin-bottom: 8px;
+  }
+  .project-subtitle {
+    font-family: var(--serif);
+    font-size: clamp(18px, 2vw, 26px);
+    font-style: italic;
+    font-weight: 300;
+    color: var(--ink-muted);
+    margin-bottom: 32px;
+  }
+  .project-meta {
+    display: flex; gap: 32px;
+    margin-bottom: 32px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--line);
+  }
+  .project-meta-item {}
+  .project-meta-key { font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 4px; }
+  .project-meta-val { font-size: 13px; font-weight: 400; }
+  .project-desc { font-size: 13px; line-height: 1.9; color: var(--ink-mid); margin-bottom: 40px; }
+  .project-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 40px; }
+  .project-tag {
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border: 1px solid var(--line);
+    color: var(--ink-muted);
+  }
+  .project-link {
+    display: inline-flex; align-items: center; gap: 12px;
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    width: fit-content;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--ink);
+    transition: gap 0.3s, color 0.2s;
+  }
+  .project-link:hover { gap: 20px; color: var(--accent); border-color: var(--accent); }
+  .project-link svg { width: 14px; height: 14px; }
+
+  /* Deliverables section inside expanded card */
+  .project-deliverables {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    display: none;
+  }
+  .project-deliverables.open { display: block; }
+  .deliverable-title { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 16px; }
+  .deliverable-list { list-style: none; }
+  .deliverable-list li {
+    font-size: 12px; color: var(--ink-mid); padding: 8px 0;
+    border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .deliverable-list li::before { content: '—'; color: var(--accent); font-size: 10px; }
+
+  /* Process section */
+  .process-section { background: var(--ink); color: var(--paper); }
+  .process-section .section-label { color: var(--accent); }
+  .process-section .section-label::before { background: var(--accent); }
+  .process-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; }
+  .process-step {
+    padding: 48px 32px;
+    border-right: 1px solid rgba(247,245,240,0.08);
+    position: relative;
+  }
+  .process-step:last-child { border-right: none; }
+  .process-step-num {
+    font-family: var(--serif);
+    font-size: 48px;
+    font-weight: 300;
+    color: rgba(247,245,240,0.1);
+    line-height: 1;
+    margin-bottom: 24px;
+  }
+  .process-step-title {
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .process-step-body { font-size: 12px; line-height: 1.8; color: rgba(247,245,240,0.55); }
+
+  /* Skills */
+  .skills-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+  .skill-block {
+    background: var(--paper-warm);
+    padding: 40px 36px;
+    transition: background 0.3s;
+  }
+  .skill-block:hover { background: var(--ink); }
+  .skill-block:hover .skill-icon, .skill-block:hover .skill-title, .skill-block:hover .skill-body { color: var(--paper); }
+  .skill-icon { font-family: var(--serif); font-size: 32px; font-weight: 300; color: var(--accent); margin-bottom: 20px; line-height: 1; }
+  .skill-title { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 12px; transition: color 0.3s; }
+  .skill-body { font-size: 12px; color: var(--ink-mid); line-height: 1.8; transition: color 0.3s; }
+
+  /* Contact */
+  .contact-section { text-align: center; padding: 140px 56px; }
+  .contact-headline {
+    font-family: var(--serif);
+    font-size: clamp(48px, 6vw, 96px);
+    font-weight: 300;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 40px;
+  }
+  .contact-headline em { font-style: italic; color: var(--ink-muted); }
+  .contact-desc { font-size: 14px; color: var(--ink-mid); max-width: 480px; margin: 0 auto 56px; line-height: 1.9; }
+  .contact-links { display: flex; justify-content: center; gap: 48px; }
+  .contact-link {
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink); text-decoration: none;
+    border-bottom: 1px solid var(--line); padding-bottom: 4px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .contact-link:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* Footer */
+  footer {
+    padding: 32px 56px;
+    border-top: 1px solid var(--line);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  footer p { font-size: 11px; color: var(--ink-muted); letter-spacing: 0.06em; }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-up { opacity: 0; animation: fadeUp 0.8s ease forwards; }
+  .fade-up:nth-child(1) { animation-delay: 0.1s; }
+  .fade-up:nth-child(2) { animation-delay: 0.25s; }
+  .fade-up:nth-child(3) { animation-delay: 0.4s; }
+  .fade-up:nth-child(4) { animation-delay: 0.55s; }
+
+  /* Placeholder image styling */
+  .img-placeholder {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 12px;
+    background: var(--paper-warm);
+    min-height: 420px;
+  }
+  .img-placeholder-icon {
+    width: 48px; height: 48px;
+    border: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .img-placeholder-text { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-muted); }
+
+  /* Gallery strip */
+  .gallery-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 2px;
+  }
+  .gallery-item {
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    background: var(--paper-warm);
+    position: relative;
+  }
+  .gallery-item img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: grayscale(20%);
+    transition: transform 0.6s, filter 0.4s;
+  }
+  .gallery-item:hover img { transform: scale(1.05); filter: grayscale(0%); }
+  .gallery-label {
+    position: absolute; bottom: 12px; left: 12px;
+    font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: rgba(247,245,240,0.8);
+    background: rgba(15,15,13,0.5);
+    padding: 4px 10px;
+    backdrop-filter: blur(4px);
+  }
+
+  @media (max-width: 900px) {
+    nav { padding: 24px 28px; }
+    section { padding: 80px 28px; }
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    .hero-left { padding: 120px 28px 80px; }
+    .about-grid { grid-template-columns: 1fr; gap: 40px; }
+    .project-card { grid-template-columns: 1fr; }
+    .project-card.reverse { direction: ltr; }
+    .process-grid { grid-template-columns: 1fr 1fr; }
+    .skills-grid { grid-template-columns: 1fr 1fr; }
+    .gallery-strip { grid-template-columns: 1fr 1fr; }
+    .projects-header { padding: 0 28px 48px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Lynet Yutian Zhang</a>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#work">Work</a>
+    <a href="#process">Process</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-left">
+    <p class="hero-eyebrow fade-up">Design Manager · Architecture & Real Estate</p>
+    <h1 class="hero-name fade-up">Spatial<br>Design <em>at</em><br>Scale</h1>
+    <p class="hero-desc fade-up">9+ years delivering architectural and retail environments from concept to construction — for Porsche, Bentley, BMW, and Lamborghini across China.</p>
+    <div class="hero-stats fade-up">
+      <div>
+        <div class="hero-stat-num">42+</div>
+        <div class="hero-stat-label">Locations</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">CAD 15M</div>
+        <div class="hero-stat-label">Largest project</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">9</div>
+        <div class="hero-stat-label">Years exp.</div>
+      </div>
+    </div>
+    <div class="hero-line"></div>
+  </div>
+  <div class="hero-right">
+    <!-- REPLACE: hero image — recommend a wide architectural interior or exterior shot -->
+    <img src="./pictures/BMW Suzhou3.jfif" alt="Architectural interior">
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-label">About</div>
+  <div class="about-grid">
+    <div>
+      <h2 class="about-headline">Design that lives<br>in the <em>real world</em></h2>
+    </div>
+    <div>
+      <div class="about-body">
+        <p>I'm a Design Manager with a Master of Architecture from Cornell and over nine years of experience leading the design and delivery of commercial and automotive retail environments — working on the owner side, not the consultant side.</p>
+        <p>That distinction matters. I'm accountable for outcomes, not deliverables. My role spans creative direction, consultant coordination, budget governance, and quality control — from the first concept sketch to the day a building opens.</p>
+        <p>I'm now relocating to Vancouver with Permanent Resident status, and I'm looking for roles where spatial design, brand experience, and operational rigor intersect at scale.</p>
+      </div>
+      <div class="about-caps">
+        <span class="cap-tag">Design Leadership</span>
+        <span class="cap-tag">Brand Standards</span>
+        <span class="cap-tag">Concept → Construction</span>
+        <span class="cap-tag">Multi-site Portfolio</span>
+        <span class="cap-tag">PMP Certified</span>
+        <span class="cap-tag">AutoCAD</span>
+        <span class="cap-tag">Adobe Creative Suite</span>
+        <span class="cap-tag">AI-assisted Design</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORK -->
+<div id="work">
+  <div class="projects-header">
+    <h2 class="projects-headline">Selected<br>Projects</h2>
+    <div class="projects-count">04</div>
+  </div>
+
+  <!-- PROJECT 01 -->
+  <div class="project-card">
+    <div class="project-image">
+      <!-- REPLACE: Bentley Shanghai interior / exterior photo -->
+      <img src="./pictures/renderings/6.jpg" alt="Bentley Shanghai Showroom">
+      <div class="project-image-overlay"></div>
+    </div>
+    <div class="project-info">
+      <div class="project-num">01 / 04</div>
+      <h3 class="project-title">Bentley Shanghai</h3>
+      <div class="project-subtitle">Showroom & Workshop</div>
+      <div class="project-meta">
+        <div class="project-meta-item">
+          <div class="project-meta-key">Budget</div>
+          <div class="project-meta-val">CAD 4M</div>
+        </div>
+        <div class="project-meta-item">
+          <div class="project-meta-key">Type</div>
+          <div class="project-meta-val">CI Pilot</div>
+        </div>
+        <div class="project-meta-item">
+          <div class="project-meta-key">Scale</div>
+          <div class="project-meta-val">Full lifecycle</div>
+        </div>
+      </div>
+      <p class="project-desc">One of three national pilot projects for Bentley China's new Corporate Identity rollout. Led all design direction from brief through construction handover — coordinating international brand stakeholders, local architects, and contractors under a compressed timeline. The approved design became the reference template for subsequent CN locations.</p>
+      <div class="project-tags">
+        <span class="project-tag">Luxury Retail</span>
+        <span class="project-tag">Brand CI</span>
+        <span class="project-tag">Showroom</span>
+        <span class="project-tag">Workshop</span>
+        <span class="project-tag">Multi-stakeholder</span>
+      </div>
+      <a href="#" class="project-link" onclick="toggleDetails(this); return false;">
+        View Details
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M1 7h12M8 2l5 5-5 5"/></svg>
+      </a>
+      <div class="project-deliverables">
+        <div class="deliverable-title">Project Highlights</div>
+        <ul class="deliverable-list">
+          <li>National CI pilot — result used as template for 10+ future sites</li>
+          <li>Coordinated global brand office (UK/Germany) with local Shanghai execution team</li>
+          <li>Negotiated material substitution saving RMB 1.2M without compromising brand spec</li>
+          <li>Delivered on time despite mid-project CI revision from global team</li>
+          <li>Integrated workshop function with showroom spatial identity — a first for China market</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJECT 02 -->
+  <div class="project-card reverse">
+    <div class="project-image">
+      <!-- REPLACE: Porsche Chongqing exterior or aerial photo -->
+      <img src="./pictures/Porsche Chongqing Interior.jpg" alt="Porsche Chongqing Center">
+      <div class="project-image-overlay"></div>
+    </div>
+    <div class="project-info">
+      <div class="project-num">02 / 04</div>
+      <h3 class="project-title">Porsche Chongqing</h3>
+      <div class="project-subtitle">Center Development</div>
+      <div class="project-meta">
+        <div class="project-meta-item">
+          <div class="project-meta-key">Budget</div>
+          <div class="project-meta-val">CAD 15M</div>
+        </div>
+        <div class="project-meta-item">
+          <div class="project-meta-key">Type</div>
+          <div class="project-meta-val">New build</div>
+        </div>
+        <div class="project-meta-item">
+          <div class="project-meta-key">Role</div>
+          <div class="project-meta-val">Design Lead</div>
+        </div>
+      </div>
+      <p class="project-desc">Flagship development for Porsche China — the largest single project in the portfolio at CAD 15M. Oversaw architectural and interior design direction across the full project lifecycle, from feasibility and concept design through construction completion. Managed the full consultant team including architects, structural and MEP engineers, and specialist contractors.</p>
+      <div class="project-tags">
+        <span class="project-tag">Flagship</span>
+        <span class="project-tag">New Construction</span>
+        <span class="project-tag">Automotive Retail</span>
+        <span class="project-tag">CAD 15M</span>
+      </div>
+      <a href="#" class="project-link" onclick="toggleDetails(this); return false;">
+        View Details
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M1 7h12M8 2l5 5-5 5"/></svg>
+      </a>
+      <div class="project-deliverables">
+        <div class="deliverable-title">Project Highlights</div>
+        <ul class="deliverable-list">
+          <li>Largest project delivered: CAD 15M, full new-build from concept to handover</li>
+          <li>Led a multidisciplinary consultant team of 12+ across design, structure, and MEP</li>
+          <li>Maintained Porsche global brand standard compliance across all design phases</li>
+          <li>Resolved site-specific topography constraints through creative structural coordination</li>
+          <li>Project delivered on schedule; zero major design defect callbacks post-handover</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJECT 03 -->
+  <div class="project-card">
+    <div class="project-image">
+      <!-- REPLACE: BMW Suzhou construction or completed exterior -->
+      <img src="./pictures/BMW Suzhou Exterior.jfif" alt="BMW Suzhou">
+      <div class="project-image-overlay"></div>
+    </div>
+    <div class="project-info">
+      <div class="project-num">03 / 04</div>
+      <h3 class="project-title">BMW Suzhou II</h3>
+      <div class="project-subtitle">New Construction</div>
+      <div class="project-meta">
+        <div class="project-meta-item">
+          <div class="project-meta-key">Budget</div>
+          <div class="project-meta-val">CAD 15M</div>
+        </div>
+        <div class="project-meta-item">
+          <div class="project-meta-key">Type</div>
+          <div class="project-meta-val">New build</div>
+        </div>
+        <div class="project-meta-item">
+          <div class="project-meta-key">Market</div>
+          <div class="project-meta-val">China</div>
+        </div>
+      </div>
+      <p class="project-desc">Full new-build dealership at RMB 60M — one of the largest projects in the portfolio by floor area. Coordinated design development and construction delivery across a complex urban site with adjacent existing operations. Maintained BMW corporate design standards while adapting to local planning and building code requirements.</p>
+      <div class="project-tags">
+        <span class="project-tag">CAD 15M</span>
+        <span class="project-tag">New Build</span>
+        <span class="project-tag">Urban Site</span>
+        <span class="project-tag">Brand Standards</span>
+      </div>
+      <a href="#" class="project-link" onclick="toggleDetails(this); return false;">
+        View Details
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M1 7h12M8 2l5 5-5 5"/></svg>
+      </a>
+      <div class="project-deliverables">
+        <div class="deliverable-title">Project Highlights</div>
+        <ul class="deliverable-list">
+          <li>Largest project by floor area in the dealership portfolio</li>
+          <li>Navigated complex phasing to maintain operations on adjacent existing site during construction</li>
+          <li>Coordinated BMW global design approval process with local planning submissions</li>
+          <li>Managed 18-month construction phase with bi-weekly site reviews</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJECT 04 -->
+<div class="project-card reverse">
+  <div class="project-image">
+    <!-- REPLACE: Made Hotel NYC interior image -->
+    <img src="./pictures/studio mai/0.png" alt="Made Hotel NYC">
+    <div class="project-image-overlay"></div>
+  </div>
+  <div class="project-info">
+    <div class="project-num">04 / 04</div>
+    <h3 class="project-title">Boutique Hospitality</h3>
+    <div class="project-subtitle">Made Hotel, 29th St NYC</div>
+    <div class="project-meta">
+      <div class="project-meta-item">
+        <div class="project-meta-key">Firm</div>
+        <div class="project-meta-val">Studio Mai (Los Angeles)</div>
+      </div>
+      <div class="project-meta-item">
+        <div class="project-meta-key">Type</div>
+        <div class="project-meta-val">Hospitality / Interior Design</div>
+      </div>
+      <div class="project-meta-item">
+        <div class="project-meta-key">Period</div>
+        <div class="project-meta-val">2016</div>
+      </div>
+    </div>
+    <p class="project-desc">
+      A boutique hotel project in New York City focused on refined spatial experience, material richness, and cohesive interior identity. Contributed to detailed interior design development and documentation to support design intent and execution.
+    </p>
+    <div class="project-tags">
+      <span class="project-tag">Hospitality Design</span>
+      <span class="project-tag">Interior Design</span>
+      <span class="project-tag">Materiality</span>
+      <span class="project-tag">Design Detailing</span>
+    </div>
+    <a href="#" class="project-link" onclick="toggleDetails(this); return false;">
+      View Details
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2">
+        <path d="M1 7h12M8 2l5 5-5 5"/>
+      </svg>
+    </a>
+    <div class="project-deliverables">
+      <div class="deliverable-title">Project Highlights</div>
+      <ul class="deliverable-list">
+        <li>Developed detailed interior design packages including space planning and layout coordination</li>
+        <li>Led material selection and finish specification to achieve a cohesive design concept</li>
+        <li>Produced comprehensive specification book for construction and procurement</li>
+        <li>Coordinated with architects and consultants to ensure accurate delivery of design intent</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+  <!-- Gallery strip -->
+  <div class="gallery-strip">
+    <div class="gallery-item">
+      <!-- REPLACE: detail shot — material or facade -->
+      <img src="./pictures/studio mai/2.png" alt="Material detail">
+      <span class="gallery-label">Material & Detail</span>
+    </div>
+    <div class="gallery-item">
+      <!-- REPLACE: interior ambience shot -->
+      <img src="./pictures/studio mai/1.png" alt="Interior">
+      <span class="gallery-label">Spatial Experience</span>
+    </div>
+    <div class="gallery-item">
+      <!-- REPLACE: construction / site photo -->
+      <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80" alt="Site">
+      <span class="gallery-label">Site & Construction</span>
+    </div>
+  </div>
+</div>
+
+<!-- PROCESS -->
+<section class="process-section" id="process">
+  <div class="section-label">How I Work</div>
+  <div class="process-grid">
+    <div class="process-step">
+      <div class="process-step-num">01</div>
+      <div class="process-step-title">Brief & Strategy</div>
+      <div class="process-step-body">Translate business objectives, brand standards, and site constraints into a clear design brief. Align stakeholders before committing to design direction.</div>
+    </div>
+    <div class="process-step">
+      <div class="process-step-num">02</div>
+      <div class="process-step-title">Concept Design</div>
+      <div class="process-step-body">Develop spatial concepts that balance brand identity, user experience, and buildability. Present options with clear trade-off analysis.</div>
+    </div>
+    <div class="process-step">
+      <div class="process-step-num">03</div>
+      <div class="process-step-title">Design Development</div>
+      <div class="process-step-body">Drive design from concept through detailed development, coordinating architects, engineers, and specialist consultants across all disciplines.</div>
+    </div>
+    <div class="process-step">
+      <div class="process-step-num">04</div>
+      <div class="process-step-title">Construction Delivery</div>
+      <div class="process-step-body">Maintain design intent through construction — reviewing submittals, managing RFIs, conducting site inspections, and solving on-site problems in real time.</div>
+    </div>
+    <div class="process-step">
+      <div class="process-step-num">05</div>
+      <div class="process-step-title">Handover & Standards</div>
+      <div class="process-step-body">Document outcomes, capture lessons learned, and translate project results into updated design guidelines for future portfolio rollout.</div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills" style="padding-top: 2px; padding-left: 0; padding-right: 0;">
+  <div style="padding: 0 56px 64px;">
+    <div class="section-label">Expertise</div>
+  </div>
+  <div class="skills-grid">
+    <div class="skill-block">
+      <div class="skill-icon">Ⅰ</div>
+      <div class="skill-title">Design Leadership</div>
+      <div class="skill-body">Creative direction across architectural, interior, and brand identity programs. Review and approval of design proposals from external consultants and architects.</div>
+    </div>
+    <div class="skill-block">
+      <div class="skill-icon">Ⅱ</div>
+      <div class="skill-title">Project Delivery</div>
+      <div class="skill-body">Full project lifecycle management from concept through construction handover. Budget governance, schedule control, and risk management across concurrent multi-site programs.</div>
+    </div>
+    <div class="skill-block">
+      <div class="skill-icon">Ⅲ</div>
+      <div class="skill-title">Brand & Standards</div>
+      <div class="skill-body">Development and governance of design and facility guidelines. Ensuring global brand consistency across 42+ location portfolios with local execution teams.</div>
+    </div>
+    <div class="skill-block">
+      <div class="skill-icon">Ⅳ</div>
+      <div class="skill-title">Consultant Coordination</div>
+      <div class="skill-body">Directing architects, structural and MEP engineers, interior designers, and specialist contractors across complex multi-stakeholder project environments.</div>
+    </div>
+    <div class="skill-block">
+      <div class="skill-icon">Ⅴ</div>
+      <div class="skill-title">Technical Practice</div>
+      <div class="skill-body">AutoCAD · Adobe Creative Suite · MS Project · Claude · Canvas · Adobe Firefly · ChatGPT for design documentation and workflow acceleration.</div>
+    </div>
+    <div class="skill-block">
+      <div class="skill-icon">Ⅵ</div>
+      <div class="skill-title">Education & Credentials</div>
+      <div class="skill-body">M.Arch, Cornell University · B.Arch, Tongji University · PMP® Certified (PMI) · Canada Permanent Resident · Fluent in English and Mandarin.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-section" id="contact">
+  <div class="section-label" style="justify-content: center;">Contact</div>
+  <h2 class="contact-headline">Let's build<br>something <em>together</em></h2>
+  <p class="contact-desc">Available for Design Manager roles in Vancouver, BC. Open to conversations about workplace design, real estate, retail environments, and brand-driven spaces.</p>
+  <div class="contact-links">
+    <a href="mailto:lynette.zhangyt@email.com" class="contact-link">Email</a>
+    <a href="http://www.linkedin.com/in/lynet-zhang-988944153" class="contact-link">LinkedIn</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>Lynet Yutian Zhang — Design Manager, Architecture & Real Estate</p>
+  <p>Vancouver, BC · Canada Permanent Resident · 2025</p>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+
+  (function animRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animRing);
+  })();
+
+  // Toggle project details
+  function toggleDetails(link) {
+    const card = link.closest('.project-info');
+    const details = card.querySelector('.project-deliverables');
+    const isOpen = details.classList.contains('open');
+    details.classList.toggle('open');
+    link.querySelector('svg').style.transform = isOpen ? '' : 'rotate(90deg)';
+    link.querySelector('svg').style.transition = 'transform 0.3s';
+    link.childNodes[0].textContent = isOpen ? 'View Details ' : 'Hide Details ';
+  }
+
+  // Intersection observer for scroll reveals
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+        e.target.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.project-card, .skill-block, .process-step, .about-grid > *').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
